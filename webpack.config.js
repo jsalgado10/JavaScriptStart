@@ -1,5 +1,6 @@
-const path =require('path')
-const HtmlWebpackPlugin=require('html-webpack-plugin')
+const path =require('path');
+const HtmlWebpackPlugin=require('html-webpack-plugin');
+const MiniCssExtractPlugin=require('mini-css-extract-plugin');
 
 module.exports = {
     mode : 'development',
@@ -18,10 +19,31 @@ module.exports = {
         new HtmlWebpackPlugin({
             title:'JavaScript Start',
             template: 'public/index.html'
-        })
+        }),
+        new MiniCssExtractPlugin()
     ],
     resolve:{
         extensions : [".js"],
-        
+
+    },
+    module :{
+        rules:[
+            {
+                test: /\.js?/,
+                exclude : /node_modules/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets:[
+                            '@babel/preset-env'
+                        ]
+                    }
+                }
+            },
+            {
+                test: /\.css$/i,
+                use: [MiniCssExtractPlugin.loader,"css-loader"]
+            }
+        ]
     }
 }
