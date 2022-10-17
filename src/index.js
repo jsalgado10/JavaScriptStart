@@ -1,3 +1,5 @@
 console.log("you are ready");
 import "./index.css";
-const myVar = 1;
+import { isValid } from "./utils";
+
+console.log(isValid(null));
