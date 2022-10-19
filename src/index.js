@@ -17,6 +17,58 @@ const state = {
   },
 };
 
+const getCheapestItem = () => {
+  return filteredData.reduce((acc, cur) => {
+    if (acc.price < cur.price) {
+      return acc;
+    } else {
+      return cur;
+    }
+  }, 9999);
+};
+
+const getExpensierItem = () => {
+  return filteredData.reduce((acc, cur) => {
+    if (acc.price > cur.price) {
+      return acc;
+    } else {
+      return cur;
+    }
+  }, 0);
+};
+
+const displayCheapest = () => {
+  const parent = document.getElementById("stats");
+  const divName = "cheapest-div";
+  const existing = document.getElementById(divName);
+  if (existing) {
+    parent.removeChild(existing);
+  }
+
+  const cheapest = getCheapestItem();
+
+  const div = document.createElement("div");
+  div.id = divName;
+  div.innerHTML = `The Cheapest item is ${cheapest.name} for ${cheapest.price}`;
+  parent.appendChild(div);
+};
+
+const displayExpensive = () => {
+  const parent = document.getElementById("stats");
+  const divName = "expensive-div";
+  const existing = document.getElementById(divName);
+  if (existing) {
+    parent.removeChild(existing);
+  }
+
+  const cheapest = getExpensierItem();
+
+  const div = document.createElement("div");
+  div.id = divName;
+  div.innerHTML = `The Expensive item is ${cheapest.name} for ${cheapest.price}`;
+  parent.appendChild(div);
+};
+
 const changeState = (element) => {
   const { id, value } = element.target;
   if (!isValid(id) || !isValid(value)) return;
@@ -79,13 +131,15 @@ const buildTable = () => {
     html += `<td>${size}</td>`;
     html += `<td>${price}</td>`;
     html += `<td>${category}</td>`;
-    html += `<td style="cursor:pointer" id="tr-${id}" data-delete=${id}></td>`;
+    html += `<td style="cursor:pointer" id="tr-${id}" data-delete=${id}>Delete</td>`;
     html += `</tr>`;
   });
   html += `</table>`;
   document.getElementById("items").innerHTML = html;
 
   buildDeleteLinks();
+  displayCheapest();
+  displayExpensive();
 };
 
 buildTable();
@@ -101,11 +155,13 @@ Array.prototype.unique = function (field) {
   return newArray;
 };
 
-// const filterData = (property) => {
-//   return function (value) {
-//     return data.filter((i) => i[property] == value);
-//   };
-// };
+const filterData = (property) => {
+  console.log("filter data");
+  return function (value) {
+    console.log("filter data return");
+    return data.filter((i) => i[property] === value);
+  };
+};
 
 const onFilterChange = (element) => {
   if (element.target.value === "0") {
@@ -121,7 +177,7 @@ const onFilterChange = (element) => {
 const buildFilterBox = () => {
   const categories = data.unique("category");
   let html = '<select id="category-filter">';
-  html += '<option value="0">Select Category </option>';
+  html += '<option value="0">All Categories</option>';
   categories.map((category) => {
     html += `<option value="${category}">${category}</option>`;
   });
@@ -133,11 +189,42 @@ const buildFilterBox = () => {
 
 buildFilterBox();
 
-// const curriedFilter = filterData("category");
+const curriedFilter = filterData("category");
 // const fruits = curriedFilter("fruit");
 // const drinks = curriedFilter("beverages");
 // const candy = curriedFilter("candy");
+const findCategoryMostExpensive = (records) => {
+  // debugger;
+  console.log("filter most expensice");
+  records.reduce((acc, cur) => {
+    return acc.price > cur.price ? acc : cur;
+  }, 0);
+};
 
+const compose =
+  (...fns) =>
+  (...args) =>
+    fns.reduceRight((res, fn) => [fn.call(null, ...res)], args[0]);
+
+const pipedFn = compose(findCategoryMostExpensive, curriedFilter)("beverages");
+console.log(pipedFn);
 // console.log(fruits);
 // console.log(drinks);
 // console.log(candy);
+
+const Box = (x) => ({
+  map: (f) => Box(f(x)),
+  inspect: `Box(${x})`,
+  fold: (f) => f(x),
+});
+
+const getFoodBetweenOneandTwo = (data) =>
+  Box(data)
+    .map((x) => x.filter((f) => f.category == "beverages"))
+    .map((x) => x.filter((f) => f.price > 1))
+    .map((x) => x.filter((f) => f.price < 2))
+    .map((x) => x.map((f) => f.price))
+    .map((x) => x.map((f) => parseFloat(f)))
+    .map((x) => x.reduce((a, c) => a + c), 0)
+    .fold((x) => x);
+console.log(getFoodBetweenOneandTwo(data));
