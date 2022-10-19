@@ -157,7 +157,9 @@ Array.prototype.unique = function (field) {
 
 const filterData = (property) => {
   console.log("filter data");
+  console.log(property);
   return function (value) {
+    console.log(value);
     console.log("filter data return");
     return data.filter((i) => i[property] === value);
   };
@@ -194,9 +196,8 @@ const curriedFilter = filterData("category");
 // const drinks = curriedFilter("beverages");
 // const candy = curriedFilter("candy");
 const findCategoryMostExpensive = (records) => {
-  // debugger;
-  console.log("filter most expensice");
-  records.reduce((acc, cur) => {
+  console.log("filter most expensive");
+  return records.reduce((acc, cur) => {
     return acc.price > cur.price ? acc : cur;
   }, 0);
 };
@@ -204,7 +205,7 @@ const findCategoryMostExpensive = (records) => {
 const compose =
   (...fns) =>
   (...args) =>
-    fns.reduceRight((res, fn) => [fn.call(null, ...res)], args[0]);
+    fns.reduceRight((res, fn) => [fn.call(null, ...res)], args)[0];
 
 const pipedFn = compose(findCategoryMostExpensive, curriedFilter)("beverages");
 console.log(pipedFn);
@@ -227,4 +228,5 @@ const getFoodBetweenOneandTwo = (data) =>
     .map((x) => x.map((f) => parseFloat(f)))
     .map((x) => x.reduce((a, c) => a + c), 0)
     .fold((x) => x);
+
 console.log(getFoodBetweenOneandTwo(data));
