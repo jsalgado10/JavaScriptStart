@@ -315,3 +315,18 @@ const getFoodBetweenOneandTwo = (data) =>
     .fold((x) => x);
 
 console.log(getFoodBetweenOneandTwo(data));
+
+const createItemCategory = () => {
+  const categories = data.unique("category");
+  let html = `<select id="category">`;
+  html += `<option value"0">Select a Category</option>`;
+  categories.map((c) => {
+    html += `<option value"${c}">${c}</option>`;
+  });
+  html += `</select>`;
+  document.getElementById("item-category").innerHTML = html;
+  const selectCategory = document.getElementById("category");
+  selectCategory.addEventListener("change", changeState);
+};
+
+createItemCategory();
