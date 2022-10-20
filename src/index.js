@@ -1,6 +1,6 @@
 console.log("you are ready");
 import "./index.css";
-import { isValid } from "./utils";
+import { isValid, formatMoney } from "./utils";
 import { data } from "./data";
 
 console.log(isValid(null));
@@ -15,6 +15,12 @@ const state = {
     price: 0,
     category: "",
   },
+};
+
+const getTotal = () => {
+  return filteredData.reduce((acc, cur) => {
+    return acc + cur.price;
+  }, 0);
 };
 
 const getCheapestItem = () => {
@@ -129,11 +135,14 @@ const buildTable = () => {
     const { name, id, price, category, size } = item;
     html += `<tr><td>${name}</td>`;
     html += `<td>${size}</td>`;
-    html += `<td>${price}</td>`;
+    html += `<td>${formatMoney(price)}</td>`;
     html += `<td>${category}</td>`;
     html += `<td style="cursor:pointer" id="tr-${id}" data-delete=${id}>Delete</td>`;
     html += `</tr>`;
   });
+  html += `<tr><td colspan="2"></td>`;
+  html += `<td>${formatMoney(getTotal())}</td>`;
+  html += `<td colspan="2"></td></tr>`;
   html += `</table>`;
   document.getElementById("items").innerHTML = html;
 
