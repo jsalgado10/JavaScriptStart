@@ -4,7 +4,6 @@ export const isValid = (v) => {
 };
 
 export const formatMoney = (input) => {
-  debugger;
   input = input.toString();
   const pos = input.indexOf(".");
   if (pos >= 0) {
