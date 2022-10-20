@@ -15,6 +15,8 @@ const state = {
     price: 0,
     category: "",
   },
+  sortDirection: "down",
+  sortType: "price",
 };
 
 const getTotal = () => {
@@ -123,13 +125,84 @@ const buildDeleteLinks = () => {
   }
 };
 
+const addSVG = () => {
+  filteredData.forEach((i) => {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+
+    svg.setAttribute("viewbox", "0 0 24 24");
+    svg.setAttribute("height", "24px");
+    svg.setAttribute("width", "24px");
+
+    path.setAttribute(
+      "d",
+      "M3 6v18h18v-18h-18zm5 14c0 .552-.448 1-1 1s-1-.448-1-1v-10c0-.552.448-1 1-1s1 .448 1 1v10zm5 0c0 .552-.448 1-1 1s-1-.448-1-1v-10c0-.552.448-1 1-1s1 .448 1 1v10zm5 0c0 .552-.448 1-1 1s-1-.448-1-1v-10c0-.552.448-1 1-1s1 .448 1 1v10zm4-18v2h-20v-2h5.711c.9 0 1.631-1.099 1.631-2h5.315c0 .901.73 2 1.631 2h5.712z"
+    );
+
+    svg.appendChild(path);
+    const div = document.getElementById("trash-" + i.id);
+    div.appendChild(svg);
+  });
+};
+
+const compare = (a, b) => {
+  const fielda = a.price;
+  const fieldb = b.price;
+  let comparison = 0;
+
+  if (fielda > fieldb) {
+    if (state.sortDirection === "down") {
+      comparison = 1;
+    } else {
+      comparison = -1;
+    }
+  } else if (fielda < fieldb) {
+    if (state.sortDirection === "down") {
+      comparison = -1;
+    } else {
+      comparison = 1;
+    }
+  }
+  return comparison;
+};
+
+const sortData = () => {
+  console.log("sorting data");
+  const tempData = [...filteredData].sort(compare);
+  filteredData = tempData;
+  buildTable();
+};
+
+const handleSortClick = () => {
+  console.log("handlesortclick");
+  const caret = document.getElementById("price-caret");
+  caret.classList.remove("top");
+  caret.classList.remove("down");
+  sortData();
+
+  if (state.sortDirection === "down") {
+    state.sortDirection = "top";
+    caret.classList.add("top");
+  } else {
+    state.sortDirection = "down";
+    caret.classList.add("down");
+  }
+
+  caret.removeEventListener("click", handleSortClick);
+};
+
+const assignCaret = () => {
+  const caret = document.getElementById("price-caret");
+  caret.addEventListener("click", handleSortClick);
+};
+
 const buildTable = () => {
   console.log(filteredData);
   let html = '<table style="width:90%; margin: 20px auto; color: #000">';
-  html += "<tr><th>Product</th>";
-  html += "<th>Size</th>";
-  html += "<th>Price</th>";
-  html += "<th>Category</th>";
+  html += `<tr><th>Product</th>`;
+  html += `<th>Size</th>`;
+  html += `<th class="header-sort"><span>Price</span><span id="price-caret" class="chevron ${state.sortDirection}"></span></th>`;
+  html += `<th>Category</th>`;
   html += "<th>Delete</th></tr>";
   filteredData.map((item) => {
     const { name, id, price, category, size } = item;
@@ -137,7 +210,8 @@ const buildTable = () => {
     html += `<td>${size}</td>`;
     html += `<td>${formatMoney(price)}</td>`;
     html += `<td>${category}</td>`;
-    html += `<td style="cursor:pointer" id="tr-${id}" data-delete=${id}>Delete</td>`;
+    html += `<td style="cursor:pointer" id="tr-${id}" data-delete=${id}>`;
+    html += `<div style="text-align:center" id="trash-${id}"></div></td>`;
     html += `</tr>`;
   });
   html += `<tr><td colspan="2"></td>`;
@@ -149,6 +223,8 @@ const buildTable = () => {
   buildDeleteLinks();
   displayCheapest();
   displayExpensive();
+  addSVG();
+  assignCaret();
 };
 
 buildTable();
