@@ -30,8 +30,17 @@
             <div id="item-category"></div>
           </div>
         </div>
-        <div class="col-2">
+        <div
+          class="col-2"
+          style="
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            width: 75%;
+            grid-gap: 25px;
+          "
+        >
           <button class="btn" id="save-item">Save Item</button>
+          <button class="btn" id="test-toast">Test Toast</button>
         </div>
         <div id="filter" class="filter-div"></div>
         <div id="items"></div>

@@ -2,10 +2,27 @@ console.log("you are ready");
 import "./index.css";
 import { isValid, formatMoney } from "./utils";
 import { data } from "./data";
+import { createToast } from "./toast";
 
 console.log(isValid(null));
 
 let filteredData = data;
+
+const toastContainer = document.createElement("div");
+toastContainer.id = "toastContainer";
+toastContainer.classList.add("toast-container");
+document.body.appendChild(toastContainer);
+
+const handleToatTestClick = () => {
+  createToast("hello i am a toast", "warning");
+};
+
+const testToast = () => {
+  const btnToast = document.getElementById("test-toast");
+  btnToast.addEventListener("click", handleToatTestClick);
+};
+
+testToast();
 
 const state = {
   items: data,
@@ -330,3 +347,30 @@ const createItemCategory = () => {
 };
 
 createItemCategory();
+
+const clearForm = () => {
+  Object.keys(state.currentItem).map((key) => {
+    document.getElementById(key).value = "";
+  });
+};
+
+const saveItem = () => {
+  const { name, price, size, category } = state.currentItem;
+  if (
+    name.length === 0 ||
+    price.length === 0 ||
+    size.length === 0 ||
+    category.length === 0
+  ) {
+    createToast("You are missing some data for your product", "Error");
+    return;
+  }
+  const copiedItems = [...state.items, state.currentItem];
+  state.items = copiedItems;
+  filteredData = copiedItems;
+  buildTable();
+  clearForm();
+};
+
+const saveBtn = document.getElementById("save-item");
+saveBtn.addEventListener("click", saveItem);
